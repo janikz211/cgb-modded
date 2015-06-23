@@ -72,7 +72,8 @@ Func runBot() ;Bot that runs everything in order
 		$CommandStop = -1
 		If _Sleep(1000) Then Return
 		checkMainScreen()
-		If $Is_ClientSyncError = False AND $zapandrunAvoidAttack = 0 Then
+		checkarmycamp()
+		If $Is_ClientSyncError = False AND $zapandrunAvoidAttack = 0 and $fullarmy = False Then
 			If BotCommand() Then btnStop()
 				If _Sleep(1000) Then Return
 
@@ -176,14 +177,13 @@ Func runBot() ;Bot that runs everything in order
                 Else
                     SetLog("Last attack was Zap&Run: Attack Now", $COLOR_RED)
                 EndIf
-                    
+
 			Else
 				SetLog("Restarted after Out of Sync Error: Attack Now", $COLOR_RED)
 				PushMsg("OutOfSync")
 			EndIf
-			    checkMainScreen(False)
-
-			AttackMain()
+			    If _Sleep(1000) Then Return
+			   AttackMain()
 				If _Sleep(1000) Then Return
 
 				If $Restart = True Then ContinueLoop
@@ -193,13 +193,15 @@ EndFunc   ;==>runBot
 
 Func Idle() ;Sequence that runs until Full Army
 	Local $TimeIdle = 0 ;In Seconds
+	Local $rounds = 0
 
 	While $fullArmy = False
 		if $RequestScreenshot = 1 then PushMsg("RequestScreenshot")
 		If $CommandStop = -1 Then SetLog("====== Waiting for full army ======", $COLOR_GREEN)
 		Local $hTimer = TimerInit()
 		Local $iReHere = 0
-		While $iReHere < 10
+		$rounds += 1
+		While $iReHere < 3
 			$iReHere += 1
 			If $IAmSelfish = False Then
 				DonateCC(true)
@@ -211,18 +213,14 @@ Func Idle() ;Sequence that runs until Full Army
 
 			    checkMainScreen(False)
 		If _Sleep(1000) Then ExitLoop
-		If $iCollectCounter > $COLLECTATCOUNT Then ; This is prevent from collecting all the time which isn't needed anyway
-			Collect()
+			checkArmyCamp()
 		    If $Restart = True Then ExitLoop
 			If _Sleep(1000) Or $RunState = False Then ExitLoop
-
-			$iCollectCounter = 0
-		EndIf
-		$iCollectCounter = $iCollectCounter + 1
-		If $CommandStop <> 3 AND $DontTouchMe = False Then
+		If $CommandStop <> 3 AND $DontTouchMe = False and $rounds >= 5 Then
 			SetTroops()
 			Train()
 			RevertTroops()
+			$rounds = 0
 		    If $Restart = True Then ExitLoop
 			If _Sleep(1000) Then ExitLoop
 
