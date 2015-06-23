@@ -92,7 +92,7 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 		  ;############## LSpell detection and Quantity ###########
 	    EndIf
       Next
-	  if $LSpellQ >= $iLSpellQ Then
+	  if $LSpellQ >= 3 Then
 		 SetLog(_PadStringCenter("Zap & Run active!", 54, "="), $COLOR_BLUE)
 	  Else
 		 SetLog(_PadStringCenter("Zap & Run NOT active. Not enough spells.", 54, "="), $COLOR_BLUE)
@@ -189,7 +189,7 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 				;If _Sleep(1000) Then Return
 				If $bBtnAttackNowPressed = True Then ExitLoop
 				; Zap And Run
-				If $OptZapAndRun = 1 And $LSpellQ >= $iLSpellQ Then
+				If $OptZapAndRun = 1 And $LSpellQ >= 3 Then
 					If (Number($searchDark) >= Number($SpellMinDarkStorage)) Then
 						$zapandrunAvoidAttack = 1
 						SetLog(_PadStringCenter(" Zap and Run base Found!", 50, "~"), $COLOR_GREEN)
@@ -232,7 +232,7 @@ Func VillageSearch() ;Control for searching a village that meets conditions
 				EndIf
 			EndIf
 			; Zap And Run
-			If $OptZapAndRun = 1 And $LSpellQ >= $iLSpellQ Then
+			If $OptZapAndRun = 1 And $LSpellQ >= 3 Then
 				If (Number($searchDark) >= Number($SpellMinDarkStorage)) Then
 					$zapandrunAvoidAttack = 1
 					SetLog(_PadStringCenter(" Zap and Run base Found!", 50, "~"), $COLOR_GREEN)
