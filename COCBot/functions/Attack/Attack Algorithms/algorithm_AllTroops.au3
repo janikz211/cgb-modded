@@ -19,8 +19,55 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
         If $FoundDarkSideAtk = 1 Then
                 GetDEEdge()
 		DERedDropSave()
-	EndIf
-	If ($chkRedArea) Then
+	 EndIf
+
+	 If SearchTownHallLoc() And GUICtrlRead($chkAttackTH) = $GUI_CHECKED Then
+		SetLog("Calculating Smart Attack Strategy", $COLOR_BLUE)
+		Local $hTimer = TimerInit()
+		_WinAPI_DeleteObject($hBitmapFirst)
+		$hBitmapFirst = _CaptureRegion2()
+		_GetRedArea()
+
+		SetLog("Calculated  (in " & Round(TimerDiff($hTimer) / 1000, 2) & " seconds) :")
+		;SetLog("	[" & UBound($PixelTopLeft) & "] pixels TopLeft")
+		;SetLog("	[" & UBound($PixelTopRight) & "] pixels TopRight")
+		;SetLog("	[" & UBound($PixelBottomLeft) & "] pixels BottomLeft")
+		;SetLog("	[" & UBound($PixelBottomRight) & "] pixels BottomRight")
+		Switch $AttackTHType
+			Case 0
+				algorithmTH()
+				_CaptureRegion()
+				If _ColorCheck(_GetPixelColor(746, 498), Hex(0x0E1306, 6), 20) Then AttackTHNormal() ;if 'no star' use another attack mode.
+			Case 1
+				AttackTHNormal();Good for Masters
+			Case 2
+				AttackTHXtreme();Good for Champ
+			Case 3
+				AttackTHgbarch(); good for masters+
+			Case 4
+				AttackTHSmartBarch(); Good for Snipe While Train
+			Case 5
+				AttackTHLimitedBarch(); Good for Snipe While Train
+			 Case 6
+				AttackTHGiarch()
+		EndSwitch
+
+		If $OptTrophyMode = 1 And SearchTownHallLoc() Then; Return ;Exit attacking if trophy hunting and not bullymode
+
+			For $i = 1 To 30
+				_CaptureRegion()
+				If _ColorCheck(_GetPixelColor(746, 498), Hex(0x0E1306, 6), 20) = False Then ExitLoop ;exit if not 'no star'
+				_Sleep(1000)
+			Next
+
+			Click(62, 519) ;Click Surrender
+			If _Sleep(3000) Then Return
+			Click(512, 394) ;Click Confirm
+			Return
+		EndIf
+	 EndIf
+
+	If ($chkRedArea) and SearchTownHallLoc() = False Then
 		SetLog("Calculating Smart Attack Strategy", $COLOR_BLUE)
 		Local $hTimer = TimerInit()
 		_WinAPI_DeleteObject($hBitmapFirst)
@@ -108,39 +155,6 @@ Func algorithm_AllTroops() ;Attack Algorithm for all existing troops
 	Next
 
 	If _Sleep(2000) Then Return
-
-	If SearchTownHallLoc() And GUICtrlRead($chkAttackTH) = $GUI_CHECKED Then
-		Switch $AttackTHType
-			Case 0
-				algorithmTH()
-				_CaptureRegion()
-				If _ColorCheck(_GetPixelColor(746, 498), Hex(0x0E1306, 6), 20) Then AttackTHNormal() ;if 'no star' use another attack mode.
-			Case 1
-				AttackTHNormal();Good for Masters
-			Case 2
-				AttackTHXtreme();Good for Champ
-			Case 3
-				AttackTHgbarch(); good for masters+
-			Case 4
-				AttackTHSmartBarch(); Good for Snipe While Train
-			Case 5
-				AttackTHLimitedBarch(); Good for Snipe While Train
-		EndSwitch
-
-		If $OptTrophyMode = 1 And SearchTownHallLoc() Then; Return ;Exit attacking if trophy hunting and not bullymode
-
-			For $i = 1 To 30
-				_CaptureRegion()
-				If _ColorCheck(_GetPixelColor(746, 498), Hex(0x0E1306, 6), 20) = False Then ExitLoop ;exit if not 'no star'
-				_Sleep(1000)
-			Next
-
-			Click(62, 519) ;Click Surrender
-			If _Sleep(3000) Then Return
-			Click(512, 394) ;Click Confirm
-			Return
-		EndIf
-	 EndIf
 
     $SnipeCount = 0
 	Local $nbSides = 0
